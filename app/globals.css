@@ -1,0 +1,83 @@
+:root {
+  --bg: #f4e8c8;
+  --ink: #2b1d0e;
+  --card: #fff8e1;
+  --accent: #e4572e;
+  --teal: #1b998b;
+  --yellow: #f2b134;
+}
+
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Courier New", "Malgun Gothic", "Apple SD Gothic Neo", monospace;
+  font-size: 15px;
+}
+
+main { max-width: 480px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+
+header {
+  background: var(--teal);
+  color: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  padding: 16px;
+  text-align: center;
+}
+h1 { font-size: 18px; letter-spacing: 1px; }
+.label { margin-top: 12px; font-size: 13px; }
+.total { font-size: 38px; font-weight: bold; color: var(--yellow); text-shadow: 3px 3px 0 var(--ink); word-break: keep-all; }
+
+form, section {
+  background: var(--card);
+  border: 3px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+h2 { font-size: 16px; border-bottom: 3px dashed var(--ink); padding-bottom: 6px; }
+
+label { display: grid; gap: 4px; font-weight: bold; font-size: 13px; }
+input, select {
+  font: inherit;
+  padding: 10px;
+  border: 2px solid var(--ink);
+  background: #fff;
+  border-radius: 0;
+  width: 100%;
+}
+button {
+  font: inherit;
+  font-weight: bold;
+  padding: 12px;
+  background: var(--accent);
+  color: #fff;
+  border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  cursor: pointer;
+}
+button:active { transform: translate(3px, 3px); box-shadow: none; }
+
+.empty { text-align: center; padding: 12px; }
+.group h3 {
+  display: flex;
+  justify-content: space-between;
+  background: var(--yellow);
+  border: 2px solid var(--ink);
+  padding: 6px 10px;
+  font-size: 14px;
+}
+ul { list-style: none; padding: 0; }
+li {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 4px;
+  border-bottom: 1px dotted var(--ink);
+}
+li em { font-style: normal; background: var(--teal); color: #fff; padding: 1px 6px; font-size: 12px; }
+li small { display: block; opacity: 0.7; margin-top: 2px; }
+li > span { font-weight: bold; white-space: nowrap; }
