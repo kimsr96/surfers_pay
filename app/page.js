@@ -29,6 +29,8 @@ export default function Home() {
   const [form, setForm] = useState(empty);
   const [tab, setTab] = useState("list");
   const [error, setError] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const [notice, setNotice] = useState("");
 
   const logout = () => {
     sessionStorage.removeItem("pin");
@@ -67,6 +69,48 @@ export default function Home() {
   };
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  // 영수증 사진을 줄여서 서버로 보내고, 읽은 값을 입력 칸에만 채운다(저장은 사용자가 확인 후 직접).
+  const scan = async (e) => {
+    const file = e.target.files[0];
+    e.target.value = "";
+    if (!file) return;
+    setScanning(true);
+    setNotice("");
+    try {
+      const bmp = await createImageBitmap(file);
+      const k = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.round(bmp.width * k);
+      canvas.height = Math.round(bmp.height * k);
+      canvas.getContext("2d").drawImage(bmp, 0, 0, canvas.width, canvas.height);
+      const image = canvas.toDataURL("image/jpeg", 0.85).split(",")[1];
+
+      const res = await fetch("/api/receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin, image, mime: "image/jpeg" }),
+      });
+      const r = await res.json();
+      if (!res.ok) throw new Error(r.error);
+
+      setForm((f) => ({
+        ...f,
+        amount: r.amount ?? "",
+        date: r.date ?? f.date,
+        place: r.place ?? "",
+      }));
+      const missing = [r.amount == null && "금액", r.date == null && "날짜", r.place == null && "사용처"].filter(Boolean);
+      setNotice(
+        missing.length
+          ? `${missing.join(", ")}은(는) 읽지 못했습니다. 직접 입력해 주세요.`
+          : "영수증을 읽어 채웠습니다. 내용을 확인한 뒤 추가하세요."
+      );
+    } catch (err) {
+      setNotice(`영수증을 읽지 못했습니다. 직접 입력해 주세요. (${err.message})`);
+    }
+    setScanning(false);
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -136,6 +180,11 @@ export default function Home() {
         <>
           <form onSubmit={submit}>
             <h2>지출 입력</h2>
+            <label className="scan">
+              {scanning ? "영수증 읽는 중..." : "📷 영수증 사진으로 채우기"}
+              <input type="file" accept="image/*" disabled={scanning} onChange={scan} hidden />
+            </label>
+            {notice && <p className="notice">{notice}</p>}
             <label>금액
               <input type="number" min="1" required inputMode="numeric" value={form.amount} onChange={set("amount")} placeholder="0" />
             </label>
