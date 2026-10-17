@@ -81,3 +81,5 @@ li {
 li em { font-style: normal; background: var(--teal); color: #fff; padding: 1px 6px; font-size: 12px; }
 li small { display: block; opacity: 0.7; margin-top: 2px; }
 li > span { font-weight: bold; white-space: nowrap; }
+
+.error { color: var(--accent); font-weight: bold; }

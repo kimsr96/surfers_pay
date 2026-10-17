@@ -2,3 +2,4 @@ node_modules
 .next
 .omc
 .claude
+.env.local

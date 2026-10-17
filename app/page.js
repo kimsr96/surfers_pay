@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "./supabase";
 
 const CATEGORIES = ["식비", "카페", "교통", "쇼핑", "구독", "기타"];
 const won = (n) => n.toLocaleString("ko-KR") + "원";
@@ -11,15 +12,29 @@ const today = () => {
 const empty = () => ({ amount: "", place: "", category: CATEGORIES[0], date: today(), memo: "" });
 
 export default function Home() {
-  // ponytail: 저장하지 않음(요청사항). 새로고침하면 사라진다.
   const [items, setItems] = useState([]);
   const [form, setForm] = useState(empty);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    supabase.from("expenses").select("*").order("id", { ascending: false }).then(({ data, error }) => {
+      if (error) setError(error.message);
+      else setItems(data);
+    });
+  }, []);
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    setItems([{ ...form, amount: Number(form.amount), id: Date.now() }, ...items]);
+    const { data, error } = await supabase
+      .from("expenses")
+      .insert({ ...form, amount: Number(form.amount) })
+      .select()
+      .single();
+    if (error) return setError(error.message);
+    setError("");
+    setItems([data, ...items]);
     setForm(empty());
   };
 
@@ -57,6 +72,7 @@ export default function Home() {
         <label>메모
           <input value={form.memo} onChange={set("memo")} placeholder="선택" />
         </label>
+        {error && <p className="error">{error}</p>}
         <button type="submit">추가하기</button>
       </form>
 
